@@ -1,0 +1,23 @@
+---
+title: "補充 - 資料屬性"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 資料屬性
+
+```{r}
+1; 20.0; 3e2  # 數值
+class(1)
+"stat"  # 文字
+class("stat")
+TRUE; T; FALSE; F  # 邏輯真假值
+class(T)
+```
+
+- 若將多個語句寫在同一行時可用分號(;)代表語句結束，否則一般情況下可省略。
+- 使用成對的雙引號(")或單引號(')表示字串。
+- TRUE和FALSE為R的保留字，T和F則不是，使用上需小心。

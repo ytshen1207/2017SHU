@@ -1,0 +1,44 @@
+---
+title: "補充 - 存取其他資料格式檔案"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 存取其他軟體的資料檔
+
+```{r, eval=FALSE}
+library(readxl)
+babies_xls = read_excel("babies.xls", sheet=1)  # 讀取xls檔
+library(xlsx)
+babies_xlsx = read.xlsx("babies.xlsx", sheetIndex=2)  # 讀取xlsx檔
+write.xlsx(iris, "iris.xlsx", sheetName="iris")  # 匯出xlsx檔
+```
+
+- 存取Excel檔案的方式很多，除了上面介紹的方法之外，還有例如openxlsx, RODBC, gdata等套件可實作。
+
+```{r, eval=FALSE}
+library(sas7bdat)
+babies_sas = read.sas7bdat("babies.sas7bdat")  # 讀取sas資料檔
+library(foreign)
+babies_spss = read.spss("babies.sav", to.data.frame=T)  # 讀取spss資料檔
+```
+
+## 存取單一R物件
+
+```{r, eval=FALSE}
+saveRDS(iris, file="iris.rds")
+iris2 = readRDS("iris.rds")  # 將讀取的R物件指派至新的變數名稱
+```
+
+## 存取R工作空間
+
+```{r, eval=FALSE}
+save(weight, height, file="babies.RData")
+save.image()  # 儲存工作空間
+load("babies.RData")
+```
+
+- RDS是用來存取單一的R物件，效率上也較高。如果要同時存取多個R物件或是工作空間，則使用RDA。
