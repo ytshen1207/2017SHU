@@ -1,0 +1,108 @@
+---
+title: "預測模型"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 新聞案例研析
+
+[李奧擔心不已！凱特溫絲蕾三跳冰湖凍僵了](http://www.appledaily.com.tw/realtimenews/article/new/20171027/1229628/)
+
+下載檔案：
+[http://ytshen.carra.org.tw/data/titanic.csv](http://ytshen.carra.org.tw/data/titanic.csv)
+
+資料來源：
+[Kaggle](https://www.kaggle.com/c/titanic)
+
+```{r, eval=FALSE}
+## 檢視現行工作目錄，把下載的檔案放在工作目錄下
+getwd()
+
+## 讀取資料
+titanic = read.csv("titanic.csv", fileEncoding="UTF-8")
+
+## 檢視資料
+View(titanic)
+```
+
+```{r, echo=FALSE}
+titanic = read.csv("20171030_files/titanic.csv", fileEncoding="UTF-8")
+```
+
+## 描述性統計
+
+進行分析之前，可以用一些摘要統計和繪圖技巧先大致看一下我們感興趣的變數的分佈情況：
+
+```{r}
+## 資料摘要
+summary(titanic)
+
+## 載入ggplot2套件
+library(ggplot2)
+
+## 類別變數 vs 是否生還長條圖
+ggplot(titanic, aes(x=艙等, fill=factor(是否生還))) +
+  geom_bar(position="dodge") +
+  facet_grid(. ~ 性別)
+
+## 數值變數 vs 是否生還散佈圖
+## 第4~7個變數為數值變數，是否生還為0,1二元變數，加2後分別為2(否，紅色)、3(是，綠色)
+plot(titanic[4:7], col=titanic$是否生還+2)
+```
+
+可以看出**艙等**、**性別**、**票價**等可能都是影響生還機會的重要因素。
+
+## 簡單羅吉斯迴歸分析
+
+描述性統計的解釋終究較為主觀，接下來進一步利用統計模型探討影響生還機會的重要因子甚至進行預測。
+
+我們可以使用羅吉斯迴歸(Logistic regression)進行分析預測：
+
+![](20171030_files/logistic.png)
+
+```{r}
+## 簡單羅吉斯迴歸模型
+fit = glm(是否生還 ~ 票價, data=titanic, family="binomial")
+
+## 模型摘要
+summary(fit)
+
+## 迴歸線
+ggplot(titanic, aes(x=票價, y=是否生還)) +
+  geom_point() +
+  geom_smooth(method="glm", method.args=list(family="binomial"))
+```
+
+## 多元羅吉斯迴歸分析
+
+```{r}
+## 多元羅吉斯迴歸模型
+fit2 = glm(是否生還 ~ ., data=titanic, family="binomial")
+
+## 模型摘要
+summary(fit2)
+```
+
+## 分類模型的應用
+
+```{r}
+## 預測資料抽樣
+newdata = titanic[sample(nrow(titanic),30),]
+
+## 預測
+pred = predict(fit2, newdata, type="response")
+
+## 衡量分類正確率 - 混淆矩陣
+table(newdata$是否生還, round(pred))
+```
+
+## 小試身手
+
+1. 使用R內建的**mtcars**資料檔。
+2. 建立一個羅吉斯迴歸模型，目標變數(Y)為手/自排(**am**)。
+3. 針對建立的模型解釋其**意義**。
+
+把你的程式碼存為**學號.R**，夾帶附件mail至[ytshen1207@gmail.com](mailto:ytshen1207@gmail.com)。 信裡面註明你的**姓名、學號**以及**分析結果的解釋**。
