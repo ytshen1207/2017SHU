@@ -1,0 +1,73 @@
+---
+title: "補充 - 資料預處理"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## dplyr套件
+
+dplyr是用於資料整理的一個套件，主要作者為Hadley Wickham(與ggplot2套件同作者)。與ggplot2套件一樣，dplyr在對於資料的操作上較具有一致性，因此受到許多R開發者的喜愛。
+
+以下僅介紹非常非常基礎的資料整理方法，實務上碰到的資料有可能需要更為複雜的處理步驟，例如字串處理、日期時間處理、去重複、資料合併等等，這些都得視實際情況而定。
+因此同學在了解大致資料處理概念後，遇到問題時還是請善用help(?)功能或上網搜尋可能的解決方案。
+
+```{r, message=FALSE}
+## 安裝並載入dplyr套件
+## install.packages("dplyr")
+library(dplyr)
+
+## 讀取資料，以睡眠品質調查資料為例
+sleep = read.csv("https://docs.google.com/spreadsheets/d/1tGQHE3rO-KAyHNDkrIMoWDOuG7MVdH6uabMatruUEKo/export?format=csv", fileEncoding="UTF-8")
+```
+
+## 欄位篩選
+
+```{r}
+## select函數
+sleep = select(sleep, 性別, 實際睡眠長度, 白天睡眠時間, 是否有失眠困擾)
+sleep
+```
+
+## 資料篩選
+
+```{r}
+## filter函數
+sleep = filter(sleep, 性別 == "女")
+sleep
+```
+
+## 新增/修改欄位內容
+
+```{r}
+## mutate函數
+sleep = mutate(sleep, 總睡眠時間 = 實際睡眠長度 * 60 + 白天睡眠時間)
+sleep
+```
+
+## 分組彙整計算
+
+```{r}
+## group_by, summarise函數
+sleep = group_by(sleep, 是否有失眠困擾)
+sleep = summarise(sleep, 睡眠時間平均 = mean(總睡眠時間))
+sleep
+```
+
+## 資料重新編碼
+
+```{r}
+## recode函數
+sleep = mutate(sleep, 是否有失眠困擾 = recode(是否有失眠困擾, `是`=1, `否`=0))
+sleep
+```
+
+## 資料排序
+
+```{r}
+## arrange函數
+sleep = arrange(sleep, 睡眠時間平均)
+sleep
+```
