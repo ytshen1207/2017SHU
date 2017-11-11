@@ -1,0 +1,61 @@
+---
+title: "補充 - 多頁爬蟲"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, eval=FALSE}
+## 載入rvest套件
+library(rvest)
+
+## 宣告變數(通常在跑迴圈需要根據每次結果合併物件時會用到)
+ptt_data = NULL
+
+## 迴圈總共執行五次，第一次i=201、第二次i=202，以此類推第五次i=205
+for (i in 201:205) {
+  ## 讀取網頁內容
+  ptt_page = read_html(paste0("https://www.ptt.cc/bbs/TWICE/index",i,".html"))
+  
+  ## 推文數
+  node_nrec = html_nodes(ptt_page, xpath="//div[@class='nrec']")
+  ptt_nrec = html_text(node_nrec)
+  
+  ## 文章標記
+  node_mark = html_nodes(ptt_page, xpath="//div[@class='mark']")
+  ptt_mark = html_text(node_mark)
+  
+  ## 標題
+  node_title = html_nodes(ptt_page, xpath="//div[@class='title']/a")
+  ptt_title = html_text(node_title)
+  
+  ## 網址
+  node_url = html_nodes(ptt_page, xpath="//div[@class='title']/a")
+  ptt_url = html_attr(node_url, name="href")
+  
+  ## 發文日期
+  node_date = html_nodes(ptt_page, xpath="//div[@class='date']")
+  ptt_date = html_text(node_date)
+  
+  ## 作者
+  node_author = html_nodes(ptt_page, xpath="//div[@class='author']")
+  ptt_author = html_text(node_author)
+  
+  ## 轉成資料框架型態
+  ptt_TWICE = data.frame(
+    推文數 = ptt_nrec,
+    文章標記 = ptt_mark,
+    標題 = ptt_title,
+    網址 = ptt_url,
+    發文日期 = ptt_date,
+    作者 = ptt_author
+  )
+  
+  ## 合併每次迴圈的結果
+  ptt_data = rbind(ptt_data, ptt_TWICE)
+}
+
+View(ptt_data)
+```

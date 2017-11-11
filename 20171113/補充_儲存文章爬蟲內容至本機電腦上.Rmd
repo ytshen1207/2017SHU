@@ -1,0 +1,30 @@
+---
+title: "補充 - 儲存文章爬蟲內容至本機電腦上"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+有了每篇文章的網址後，我們就可以藉此取得文章的內容。概念上與前面都相同，尋找相對應的XPath後利用html_text()函數擷取文章內容。接著可以使用write()函數將文章內容儲存至本機電腦上。
+
+以下範例假設ptt_data是已經藉由爬蟲獲取到的連結資訊。
+
+```{r, eval=FALSE}
+## 設定工作目錄(抓下來的檔案要存放的位置，記得要先創好目錄)
+setwd("D:/PTT/")
+
+## 迴圈從i=1跑到i=100(ptt_data的資料筆數)
+for (i in 1:nrow(ptt_data)) {
+  ## 讀取網頁內容，網址就是前面抓到的連結，透過迴圈動態替換
+  ptt_page = read_html(paste0("https://www.ptt.cc", ptt_data[i,"網址"]))
+  
+  ## 利用觀察到的XPath獲取節點及文章內容
+  node_content = html_nodes(ptt_page, xpath="//div[@id='main-content']")
+  ptt_content = html_text(node_content)
+  
+  ## 寫出至本機電腦上，檔案名稱為1.txt ~ 100.txt
+  write(ptt_content, paste0(i,".txt"))
+}
+```
